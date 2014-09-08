@@ -1,3 +1,5 @@
+IF(NOT BIICODE)
+
 project(EigenDemos)
 
 add_custom_target(demos)
@@ -11,3 +13,4 @@ if(NOT EIGEN_TEST_NOQT)
     message(STATUS "Qt4 not found, so disabling the mandelbrot and opengl demos")
   endif(QT4_FOUND)
 endif()
+ENDIF()

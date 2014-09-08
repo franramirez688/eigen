@@ -1,6 +1,12 @@
-project(Eigen)
+IF(BIICODE)
+	include(${CMAKE_HOME_DIRECTORY}/biicode.cmake)
+	# Initializes block variables
+	INIT_BIICODE_BLOCK()
 
-cmake_minimum_required(VERSION 2.8.2)
+ELSE()
+	project(Eigen)
+	cmake_minimum_required(VERSION 2.8.2)
+ENDIF()
 
 # guard against in-source builds
 
@@ -27,7 +33,7 @@ endif()
 #############################################################################
 
 # automatically parse the version number
-file(READ "${PROJECT_SOURCE_DIR}/Eigen/src/Core/util/Macros.h" _eigen_version_header)
+file(READ "${CMAKE_CURRENT_SOURCE_DIR}/Eigen/src/Core/util/Macros.h" _eigen_version_header)
 string(REGEX MATCH "define[ \t]+EIGEN_WORLD_VERSION[ \t]+([0-9]+)" _eigen_world_version_match "${_eigen_version_header}")
 set(EIGEN_WORLD_VERSION "${CMAKE_MATCH_1}")
 string(REGEX MATCH "define[ \t]+EIGEN_MAJOR_VERSION[ \t]+([0-9]+)" _eigen_major_version_match "${_eigen_version_header}")
@@ -56,7 +62,7 @@ endif(EIGEN_HG_CHANGESET)
 
 include(CheckCXXCompilerFlag)
 
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 #############################################################################
 # find how to link to the standard libraries                                #
@@ -286,7 +292,8 @@ endif()
 
 option(EIGEN_TEST_C++0x "Enables all C++0x features." OFF)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 # the user modifiable install path for header files
 set(EIGEN_INCLUDE_INSTALL_DIR ${EIGEN_INCLUDE_INSTALL_DIR} CACHE PATH "The directory where we install the header files (optional)")
@@ -307,6 +314,9 @@ else()
   )
 endif()
 
+ADD_BIICODE_TARGETS()
+
+
 # similar to set_target_properties but append the property instead of overwriting it
 macro(ei_add_target_property target prop value)
 
@@ -318,10 +328,12 @@ macro(ei_add_target_property target prop value)
   set_target_properties(${target} PROPERTIES ${prop} "${previous} ${value}")
 endmacro(ei_add_target_property)
 
-install(FILES
-  signature_of_eigen3_matrix_library
-  DESTINATION ${INCLUDE_INSTALL_DIR} COMPONENT Devel
-  )
+IF(NOT BIICODE)
+	install(FILES
+	  signature_of_eigen3_matrix_library
+	  DESTINATION ${INCLUDE_INSTALL_DIR} COMPONENT Devel
+	  )
+ENDIF()
 
 if(EIGEN_BUILD_PKGCONFIG)
     SET(path_separator ":")
@@ -337,52 +349,58 @@ if(EIGEN_BUILD_PKGCONFIG)
     endif(pkg_config_libdir)
 
     configure_file(eigen3.pc.in eigen3.pc)
-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/eigen3.pc
-        DESTINATION ${pkg_config_install_dir}/pkgconfig
-        )
+	IF(NOT BIICODE)
+		install(FILES ${CMAKE_CURRENT_BINARY_DIR}/eigen3.pc
+			DESTINATION ${pkg_config_install_dir}/pkgconfig
+			)
+		ENDIF()
 endif(EIGEN_BUILD_PKGCONFIG)
 
-add_subdirectory(Eigen)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Eigen)
 
-add_subdirectory(doc EXCLUDE_FROM_ALL)
+IF(NOT BIICODE)
+	add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/doc EXCLUDE_FROM_ALL)
+ENDIF()
 
 include(EigenConfigureTesting)
 
 # fixme, not sure this line is still needed:
 enable_testing() # must be called from the root CMakeLists, see man page
 
-
 if(EIGEN_LEAVE_TEST_IN_ALL_TARGET)
-  add_subdirectory(test) # can't do EXCLUDE_FROM_ALL here, breaks CTest
+  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/test) # can't do EXCLUDE_FROM_ALL here, breaks CTest
 else()
-  add_subdirectory(test EXCLUDE_FROM_ALL)
+  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/test EXCLUDE_FROM_ALL)
 endif()
 
-if(EIGEN_LEAVE_TEST_IN_ALL_TARGET)
-  add_subdirectory(blas)
-  add_subdirectory(lapack)
-else()
-  add_subdirectory(blas EXCLUDE_FROM_ALL)
-  add_subdirectory(lapack EXCLUDE_FROM_ALL)
-endif()
+IF(NOT BIICODE)
 
-add_subdirectory(unsupported)
 
-add_subdirectory(demos EXCLUDE_FROM_ALL)
+	if(EIGEN_LEAVE_TEST_IN_ALL_TARGET)
+	  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/blas)
+	  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lapack)
+	else()
+	  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/blas EXCLUDE_FROM_ALL)
+	  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lapack EXCLUDE_FROM_ALL)
+	endif()
+	
+	add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/unsupported)
+ENDIF()
 
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/demos EXCLUDE_FROM_ALL)
 # must be after test and unsupported, for configuring buildtests.in
-add_subdirectory(scripts EXCLUDE_FROM_ALL)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/scripts EXCLUDE_FROM_ALL)
 
 # TODO: consider also replacing EIGEN_BUILD_BTL by a custom target "make btl"?
 if(EIGEN_BUILD_BTL)
-  add_subdirectory(bench/btl EXCLUDE_FROM_ALL)
+  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/bench/btl EXCLUDE_FROM_ALL)
 endif(EIGEN_BUILD_BTL)
 
 if(NOT WIN32)
-  add_subdirectory(bench/spbench EXCLUDE_FROM_ALL)
+  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/bench/spbench EXCLUDE_FROM_ALL)
 endif(NOT WIN32)
 
-configure_file(scripts/cdashtesting.cmake.in cdashtesting.cmake @ONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/cdashtesting.cmake.in cdashtesting.cmake @ONLY)
 
 ei_testing_print_summary()
 
@@ -392,7 +410,7 @@ message(STATUS "")
 
 option(EIGEN_FAILTEST "Enable failtests." OFF)
 if(EIGEN_FAILTEST)
-  add_subdirectory(failtest)
+  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/failtest)
 endif()
 
 string(TOLOWER "${CMAKE_GENERATOR}" cmake_generator_tolower)

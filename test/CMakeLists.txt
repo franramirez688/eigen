@@ -1,4 +1,3 @@
-
 # generate split test header file
 message(STATUS ${CMAKE_CURRENT_BINARY_DIR})
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/split_test_helper.h "")
