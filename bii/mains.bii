@@ -1,0 +1,3 @@
+!bench/*
+!test/main.h
+!test/eigen2/main.h

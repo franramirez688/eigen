@@ -2,10 +2,11 @@ IF(BIICODE)
 	include(${CMAKE_HOME_DIRECTORY}/biicode.cmake)
 	# Initializes block variables
 	INIT_BIICODE_BLOCK()
-
+  ADD_BIICODE_TARGETS()
 ELSE()
-	project(Eigen)
-	cmake_minimum_required(VERSION 2.8.2)
+  
+project(Eigen)
+cmake_minimum_required(VERSION 2.8.2)
 ENDIF()
 
 # guard against in-source builds
@@ -172,47 +173,49 @@ if(NOT MSVC)
   
   set(CMAKE_REQUIRED_FLAGS "")
 
-  option(EIGEN_TEST_SSE2 "Enable/Disable SSE2 in tests/examples" OFF)
-  if(EIGEN_TEST_SSE2)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse2")
-    message(STATUS "Enabling SSE2 in tests/examples")
-  endif()
+  IF(NOT BIICODE)
+    option(EIGEN_TEST_SSE2 "Enable/Disable SSE2 in tests/examples" OFF)
+    if(EIGEN_TEST_SSE2)
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse2")
+      message(STATUS "Enabling SSE2 in tests/examples")
+    endif()
 
-  option(EIGEN_TEST_SSE3 "Enable/Disable SSE3 in tests/examples" OFF)
-  if(EIGEN_TEST_SSE3)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse3")
-    message(STATUS "Enabling SSE3 in tests/examples")
-  endif()
+    option(EIGEN_TEST_SSE3 "Enable/Disable SSE3 in tests/examples" OFF)
+    if(EIGEN_TEST_SSE3)
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse3")
+      message(STATUS "Enabling SSE3 in tests/examples")
+    endif()
 
-  option(EIGEN_TEST_SSSE3 "Enable/Disable SSSE3 in tests/examples" OFF)
-  if(EIGEN_TEST_SSSE3)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mssse3")
-    message(STATUS "Enabling SSSE3 in tests/examples")
-  endif()
+    option(EIGEN_TEST_SSSE3 "Enable/Disable SSSE3 in tests/examples" OFF)
+    if(EIGEN_TEST_SSSE3)
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mssse3")
+      message(STATUS "Enabling SSSE3 in tests/examples")
+    endif()
 
-  option(EIGEN_TEST_SSE4_1 "Enable/Disable SSE4.1 in tests/examples" OFF)
-  if(EIGEN_TEST_SSE4_1)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.1")
-    message(STATUS "Enabling SSE4.1 in tests/examples")
-  endif()
+    option(EIGEN_TEST_SSE4_1 "Enable/Disable SSE4.1 in tests/examples" OFF)
+    if(EIGEN_TEST_SSE4_1)
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.1")
+      message(STATUS "Enabling SSE4.1 in tests/examples")
+    endif()
 
-  option(EIGEN_TEST_SSE4_2 "Enable/Disable SSE4.2 in tests/examples" OFF)
-  if(EIGEN_TEST_SSE4_2)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.2")
-    message(STATUS "Enabling SSE4.2 in tests/examples")
-  endif()
+    option(EIGEN_TEST_SSE4_2 "Enable/Disable SSE4.2 in tests/examples" OFF)
+    if(EIGEN_TEST_SSE4_2)
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.2")
+      message(STATUS "Enabling SSE4.2 in tests/examples")
+    endif()
 
-  option(EIGEN_TEST_ALTIVEC "Enable/Disable AltiVec in tests/examples" OFF)
-  if(EIGEN_TEST_ALTIVEC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -maltivec -mabi=altivec")
-    message(STATUS "Enabling AltiVec in tests/examples")
-  endif()
+    option(EIGEN_TEST_ALTIVEC "Enable/Disable AltiVec in tests/examples" OFF)
+    if(EIGEN_TEST_ALTIVEC)
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -maltivec -mabi=altivec")
+      message(STATUS "Enabling AltiVec in tests/examples")
+    endif()
 
-  option(EIGEN_TEST_NEON "Enable/Disable Neon in tests/examples" OFF)
-  if(EIGEN_TEST_NEON)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mfpu=neon -mcpu=cortex-a8")
-    message(STATUS "Enabling NEON in tests/examples")
-  endif()
+    option(EIGEN_TEST_NEON "Enable/Disable Neon in tests/examples" OFF)
+    if(EIGEN_TEST_NEON)
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mfpu=neon -mcpu=cortex-a8")
+      message(STATUS "Enabling NEON in tests/examples")
+    endif()
+  ENDIF()
 
   check_cxx_compiler_flag("-fopenmp" COMPILER_SUPPORT_OPENMP)
   if(COMPILER_SUPPORT_OPENMP)
@@ -246,54 +249,55 @@ else(NOT MSVC)
     endif()
   endif()
 
-  option(EIGEN_TEST_SSE2 "Enable/Disable SSE2 in tests/examples" OFF)
-  if(EIGEN_TEST_SSE2)
-    if(NOT CMAKE_CL_64)
-      # arch is not supported on 64 bit systems, SSE is enabled automatically.
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:SSE2")
-    endif(NOT CMAKE_CL_64)
-    message(STATUS "Enabling SSE2 in tests/examples")
-  endif(EIGEN_TEST_SSE2)
-endif(NOT MSVC)
+  IF(NOT BIICODE)
+      option(EIGEN_TEST_SSE2 "Enable/Disable SSE2 in tests/examples" OFF)
+      if(EIGEN_TEST_SSE2)
+        if(NOT CMAKE_CL_64)
+          # arch is not supported on 64 bit systems, SSE is enabled automatically.
+          set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:SSE2")
+        endif(NOT CMAKE_CL_64)
+        message(STATUS "Enabling SSE2 in tests/examples")
+      endif(EIGEN_TEST_SSE2)
+    endif(NOT MSVC)
 
-option(EIGEN_TEST_NO_EXPLICIT_VECTORIZATION "Disable explicit vectorization in tests/examples" OFF)
-option(EIGEN_TEST_X87 "Force using X87 instructions. Implies no vectorization." OFF)
-option(EIGEN_TEST_32BIT "Force generating 32bit code." OFF)
+    option(EIGEN_TEST_NO_EXPLICIT_VECTORIZATION "Disable explicit vectorization in tests/examples" OFF)
+    option(EIGEN_TEST_X87 "Force using X87 instructions. Implies no vectorization." OFF)
+    option(EIGEN_TEST_32BIT "Force generating 32bit code." OFF)
 
-if(EIGEN_TEST_X87)
-  set(EIGEN_TEST_NO_EXPLICIT_VECTORIZATION ON)
-  if(CMAKE_COMPILER_IS_GNUCXX)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mfpmath=387")
-    message(STATUS "Forcing use of x87 instructions in tests/examples")
-  else()
-    message(STATUS "EIGEN_TEST_X87 ignored on your compiler")
-  endif()
-endif()
+    if(EIGEN_TEST_X87)
+      set(EIGEN_TEST_NO_EXPLICIT_VECTORIZATION ON)
+      if(CMAKE_COMPILER_IS_GNUCXX)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mfpmath=387")
+        message(STATUS "Forcing use of x87 instructions in tests/examples")
+      else()
+        message(STATUS "EIGEN_TEST_X87 ignored on your compiler")
+      endif()
+    endif()
 
-if(EIGEN_TEST_32BIT)
-  if(CMAKE_COMPILER_IS_GNUCXX)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
-    message(STATUS "Forcing generation of 32-bit code in tests/examples")
-  else()
-    message(STATUS "EIGEN_TEST_32BIT ignored on your compiler")
-  endif()
-endif()
+    if(EIGEN_TEST_32BIT)
+      if(CMAKE_COMPILER_IS_GNUCXX)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
+        message(STATUS "Forcing generation of 32-bit code in tests/examples")
+      else()
+        message(STATUS "EIGEN_TEST_32BIT ignored on your compiler")
+      endif()
+    endif()
 
-if(EIGEN_TEST_NO_EXPLICIT_VECTORIZATION)
-  add_definitions(-DEIGEN_DONT_VECTORIZE=1)
-  message(STATUS "Disabling vectorization in tests/examples")
-endif()
+    if(EIGEN_TEST_NO_EXPLICIT_VECTORIZATION)
+      add_definitions(-DEIGEN_DONT_VECTORIZE=1)
+      message(STATUS "Disabling vectorization in tests/examples")
+    endif()
 
-option(EIGEN_TEST_NO_EXPLICIT_ALIGNMENT "Disable explicit alignment (hence vectorization) in tests/examples" OFF)
-if(EIGEN_TEST_NO_EXPLICIT_ALIGNMENT)
-  add_definitions(-DEIGEN_DONT_ALIGN=1)
-  message(STATUS "Disabling alignment in tests/examples")
-endif()
+    option(EIGEN_TEST_NO_EXPLICIT_ALIGNMENT "Disable explicit alignment (hence vectorization) in tests/examples" OFF)
+    if(EIGEN_TEST_NO_EXPLICIT_ALIGNMENT)
+      add_definitions(-DEIGEN_DONT_ALIGN=1)
+      message(STATUS "Disabling alignment in tests/examples")
+    endif()
 
-option(EIGEN_TEST_C++0x "Enables all C++0x features." OFF)
+    option(EIGEN_TEST_C++0x "Enables all C++0x features." OFF)
+  ENDIF()
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
 # the user modifiable install path for header files
 set(EIGEN_INCLUDE_INSTALL_DIR ${EIGEN_INCLUDE_INSTALL_DIR} CACHE PATH "The directory where we install the header files (optional)")
@@ -314,9 +318,6 @@ else()
   )
 endif()
 
-ADD_BIICODE_TARGETS()
-
-
 # similar to set_target_properties but append the property instead of overwriting it
 macro(ei_add_target_property target prop value)
 
@@ -329,10 +330,10 @@ macro(ei_add_target_property target prop value)
 endmacro(ei_add_target_property)
 
 IF(NOT BIICODE)
-	install(FILES
-	  signature_of_eigen3_matrix_library
-	  DESTINATION ${INCLUDE_INSTALL_DIR} COMPONENT Devel
-	  )
+  install(FILES
+    signature_of_eigen3_matrix_library
+    DESTINATION ${INCLUDE_INSTALL_DIR} COMPONENT Devel
+    )
 ENDIF()
 
 if(EIGEN_BUILD_PKGCONFIG)
@@ -349,60 +350,57 @@ if(EIGEN_BUILD_PKGCONFIG)
     endif(pkg_config_libdir)
 
     configure_file(eigen3.pc.in eigen3.pc)
-	IF(NOT BIICODE)
-		install(FILES ${CMAKE_CURRENT_BINARY_DIR}/eigen3.pc
-			DESTINATION ${pkg_config_install_dir}/pkgconfig
-			)
-		ENDIF()
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/eigen3.pc
+        DESTINATION ${pkg_config_install_dir}/pkgconfig
+        )
 endif(EIGEN_BUILD_PKGCONFIG)
 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Eigen)
 
 IF(NOT BIICODE)
-	add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/doc EXCLUDE_FROM_ALL)
+  add_subdirectory(Eigen)
+  add_subdirectory(doc EXCLUDE_FROM_ALL)
+
+  include(EigenConfigureTesting)
+
+  # fixme, not sure this line is still needed:
+  enable_testing() # must be called from the root CMakeLists, see man page
+
+
+  if(EIGEN_LEAVE_TEST_IN_ALL_TARGET)
+    add_subdirectory(test) # can't do EXCLUDE_FROM_ALL here, breaks CTest
+  else()
+    add_subdirectory(test EXCLUDE_FROM_ALL)
+  endif()
+
+  if(EIGEN_LEAVE_TEST_IN_ALL_TARGET)
+    add_subdirectory(blas)
+    add_subdirectory(lapack)
+  else()
+    add_subdirectory(blas EXCLUDE_FROM_ALL)
+    add_subdirectory(lapack EXCLUDE_FROM_ALL)
+  endif()
+
+  add_subdirectory(unsupported)
+
+  add_subdirectory(demos EXCLUDE_FROM_ALL)
+
+  # must be after test and unsupported, for configuring buildtests.in
+  add_subdirectory(scripts EXCLUDE_FROM_ALL)
+
+  # TODO: consider also replacing EIGEN_BUILD_BTL by a custom target "make btl"?
+  if(EIGEN_BUILD_BTL)
+    add_subdirectory(bench/btl EXCLUDE_FROM_ALL)
+  endif(EIGEN_BUILD_BTL)
+
+  if(NOT WIN32)
+    add_subdirectory(bench/spbench EXCLUDE_FROM_ALL)
+  endif(NOT WIN32)
+
+  configure_file(scripts/cdashtesting.cmake.in cdashtesting.cmake @ONLY)
+  ei_testing_print_summary()
 ENDIF()
 
-include(EigenConfigureTesting)
 
-# fixme, not sure this line is still needed:
-enable_testing() # must be called from the root CMakeLists, see man page
-
-if(EIGEN_LEAVE_TEST_IN_ALL_TARGET)
-  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/test) # can't do EXCLUDE_FROM_ALL here, breaks CTest
-else()
-  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/test EXCLUDE_FROM_ALL)
-endif()
-
-IF(NOT BIICODE)
-
-
-	if(EIGEN_LEAVE_TEST_IN_ALL_TARGET)
-	  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/blas)
-	  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lapack)
-	else()
-	  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/blas EXCLUDE_FROM_ALL)
-	  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lapack EXCLUDE_FROM_ALL)
-	endif()
-	
-	add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/unsupported)
-ENDIF()
-
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/demos EXCLUDE_FROM_ALL)
-# must be after test and unsupported, for configuring buildtests.in
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/scripts EXCLUDE_FROM_ALL)
-
-# TODO: consider also replacing EIGEN_BUILD_BTL by a custom target "make btl"?
-if(EIGEN_BUILD_BTL)
-  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/bench/btl EXCLUDE_FROM_ALL)
-endif(EIGEN_BUILD_BTL)
-
-if(NOT WIN32)
-  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/bench/spbench EXCLUDE_FROM_ALL)
-endif(NOT WIN32)
-
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/cdashtesting.cmake.in cdashtesting.cmake @ONLY)
-
-ei_testing_print_summary()
 
 message(STATUS "")
 message(STATUS "Configured Eigen ${EIGEN_VERSION_NUMBER}")
@@ -410,7 +408,7 @@ message(STATUS "")
 
 option(EIGEN_FAILTEST "Enable failtests." OFF)
 if(EIGEN_FAILTEST)
-  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/failtest)
+  add_subdirectory(failtest)
 endif()
 
 string(TOLOWER "${CMAKE_GENERATOR}" cmake_generator_tolower)
