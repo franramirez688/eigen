@@ -16,8 +16,8 @@ install:
 script:
 - cmake --version
 - bii init biicode_project
-- mkdir -p ./biicode_project/blocks/fenix/test_eigen
-- mv !(biicode_project) ./biicode_project/blocks/fenix/test_eigen
+- mkdir -p ./biicode_project/blocks/eigen/eigen
+- mv !(biicode_project) ./biicode_project/blocks/eigen/eigen
 - cd biicode_project
 - bii find -um
 - bii cpp:build
