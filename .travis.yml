@@ -27,4 +27,4 @@ after_success:
 - bii publish
 env:
   global:
-    secure: Gayj0Eyxvx2hjKFE7qcuIEK2pyioYckJ2+Kkwzn+hOvj3griBdlHOvTCsHpa+2qQXx4zE64wdw97vLCzv3mY/rmcB2MpbSmz3Sy6WCHXjCpYypRhoA/9tO3gk26aBQ9b8j7dDuiOmIG1AfWHsKhMGCqhdpvIwxnBAZ3jOGCf1mU=
+    secure: Dbt6UiSc+9nUjk7kVVhbCo9opjhwwt9lRUmMzIHGL0Wb9GvHlinIYOX/GFq/Xtfpsk3pIL0/BFpzgdVmWPLBuZmAA8fbJ+zvXsL8E+QPDVKraWAO23dyY/r4/lGGLefdZ2adV5BprqUBlEeoNaKZbWLPxzROq9KVhTO89V7I1+s=
