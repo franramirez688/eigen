@@ -1,4 +1,5 @@
 !bench/*
+!unsupported/*
 !test/main.h
 !test/eigen2/main.h
 !scripts/eigen_gen_credits.cpp

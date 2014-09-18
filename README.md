@@ -1,4 +1,4 @@
-EIGEN [![Build Status](https://travis-ci.org/franramirez688/eigen.svg?branch=master)](https://travis-ci.org/franramirez688/eigen)
+EIGEN
 =======
 
 Eigen is a high-level C++ library of template headers for linear algebra, matrix and vector operations, numerical solvers and related algorithms. Eigen is an open source library licensed under MPL2 starting from version 3.1.1. Earlier versions were licensed under LGPL3+.

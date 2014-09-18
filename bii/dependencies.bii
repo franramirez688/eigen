@@ -1,2 +1,1 @@
-CMakeLists.txt + cmake/FindStandardMathLibrary.cmake
-CMakeLists.txt + eigen3.pc.in
+CMakeLists.txt + cmake/* eigen3.pc.in

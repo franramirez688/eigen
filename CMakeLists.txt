@@ -2,7 +2,10 @@ IF(BIICODE)
 	include(${CMAKE_HOME_DIRECTORY}/biicode.cmake)
 	# Initializes block variables
 	INIT_BIICODE_BLOCK()
-  ADD_BIICODE_TARGETS()
+        ADD_BIICODE_TARGETS()
+        IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/unsupported/Eigen")
+          TARGET_INCLUDE_DIRECTORIES(${BII_LIB_TARGET} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/unsupported)
+        ENDIF()
 ELSE()
   
 project(Eigen)
@@ -173,7 +176,6 @@ if(NOT MSVC)
   
   set(CMAKE_REQUIRED_FLAGS "")
 
-  IF(NOT BIICODE)
     option(EIGEN_TEST_SSE2 "Enable/Disable SSE2 in tests/examples" OFF)
     if(EIGEN_TEST_SSE2)
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse2")
@@ -215,7 +217,6 @@ if(NOT MSVC)
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mfpu=neon -mcpu=cortex-a8")
       message(STATUS "Enabling NEON in tests/examples")
     endif()
-  ENDIF()
 
   check_cxx_compiler_flag("-fopenmp" COMPILER_SUPPORT_OPENMP)
   if(COMPILER_SUPPORT_OPENMP)
@@ -249,53 +250,51 @@ else(NOT MSVC)
     endif()
   endif()
 
-  IF(NOT BIICODE)
-      option(EIGEN_TEST_SSE2 "Enable/Disable SSE2 in tests/examples" OFF)
-      if(EIGEN_TEST_SSE2)
-        if(NOT CMAKE_CL_64)
-          # arch is not supported on 64 bit systems, SSE is enabled automatically.
-          set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:SSE2")
-        endif(NOT CMAKE_CL_64)
-        message(STATUS "Enabling SSE2 in tests/examples")
-      endif(EIGEN_TEST_SSE2)
-    endif(NOT MSVC)
+    option(EIGEN_TEST_SSE2 "Enable/Disable SSE2 in tests/examples" OFF)
+    if(EIGEN_TEST_SSE2)
+      if(NOT CMAKE_CL_64)
+        # arch is not supported on 64 bit systems, SSE is enabled automatically.
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:SSE2")
+      endif(NOT CMAKE_CL_64)
+      message(STATUS "Enabling SSE2 in tests/examples")
+    endif(EIGEN_TEST_SSE2)
+  endif(NOT MSVC)
 
-    option(EIGEN_TEST_NO_EXPLICIT_VECTORIZATION "Disable explicit vectorization in tests/examples" OFF)
-    option(EIGEN_TEST_X87 "Force using X87 instructions. Implies no vectorization." OFF)
-    option(EIGEN_TEST_32BIT "Force generating 32bit code." OFF)
+  option(EIGEN_TEST_NO_EXPLICIT_VECTORIZATION "Disable explicit vectorization in tests/examples" OFF)
+  option(EIGEN_TEST_X87 "Force using X87 instructions. Implies no vectorization." OFF)
+  option(EIGEN_TEST_32BIT "Force generating 32bit code." OFF)
 
-    if(EIGEN_TEST_X87)
-      set(EIGEN_TEST_NO_EXPLICIT_VECTORIZATION ON)
-      if(CMAKE_COMPILER_IS_GNUCXX)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mfpmath=387")
-        message(STATUS "Forcing use of x87 instructions in tests/examples")
-      else()
-        message(STATUS "EIGEN_TEST_X87 ignored on your compiler")
-      endif()
+  if(EIGEN_TEST_X87)
+    set(EIGEN_TEST_NO_EXPLICIT_VECTORIZATION ON)
+    if(CMAKE_COMPILER_IS_GNUCXX)
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mfpmath=387")
+      message(STATUS "Forcing use of x87 instructions in tests/examples")
+    else()
+      message(STATUS "EIGEN_TEST_X87 ignored on your compiler")
     endif()
+  endif()
 
-    if(EIGEN_TEST_32BIT)
-      if(CMAKE_COMPILER_IS_GNUCXX)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
-        message(STATUS "Forcing generation of 32-bit code in tests/examples")
-      else()
-        message(STATUS "EIGEN_TEST_32BIT ignored on your compiler")
-      endif()
+  if(EIGEN_TEST_32BIT)
+    if(CMAKE_COMPILER_IS_GNUCXX)
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
+      message(STATUS "Forcing generation of 32-bit code in tests/examples")
+    else()
+      message(STATUS "EIGEN_TEST_32BIT ignored on your compiler")
     endif()
+  endif()
 
-    if(EIGEN_TEST_NO_EXPLICIT_VECTORIZATION)
-      add_definitions(-DEIGEN_DONT_VECTORIZE=1)
-      message(STATUS "Disabling vectorization in tests/examples")
-    endif()
+  if(EIGEN_TEST_NO_EXPLICIT_VECTORIZATION)
+    add_definitions(-DEIGEN_DONT_VECTORIZE=1)
+    message(STATUS "Disabling vectorization in tests/examples")
+  endif()
 
-    option(EIGEN_TEST_NO_EXPLICIT_ALIGNMENT "Disable explicit alignment (hence vectorization) in tests/examples" OFF)
-    if(EIGEN_TEST_NO_EXPLICIT_ALIGNMENT)
-      add_definitions(-DEIGEN_DONT_ALIGN=1)
-      message(STATUS "Disabling alignment in tests/examples")
-    endif()
+  option(EIGEN_TEST_NO_EXPLICIT_ALIGNMENT "Disable explicit alignment (hence vectorization) in tests/examples" OFF)
+  if(EIGEN_TEST_NO_EXPLICIT_ALIGNMENT)
+    add_definitions(-DEIGEN_DONT_ALIGN=1)
+    message(STATUS "Disabling alignment in tests/examples")
+  endif()
 
-    option(EIGEN_TEST_C++0x "Enables all C++0x features." OFF)
-  ENDIF()
+  option(EIGEN_TEST_C++0x "Enables all C++0x features." OFF)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
@@ -356,22 +355,23 @@ if(EIGEN_BUILD_PKGCONFIG)
 endif(EIGEN_BUILD_PKGCONFIG)
 
 
+
+
 IF(NOT BIICODE)
   add_subdirectory(Eigen)
+include(EigenConfigureTesting)
+
+# fixme, not sure this line is still needed:
+enable_testing() # must be called from the root CMakeLists, see man page
+
+
+if(EIGEN_LEAVE_TEST_IN_ALL_TARGET)
+  add_subdirectory(test) # can't do EXCLUDE_FROM_ALL here, breaks CTest
+else()
+  add_subdirectory(test EXCLUDE_FROM_ALL)
+endif()
+
   add_subdirectory(doc EXCLUDE_FROM_ALL)
-
-  include(EigenConfigureTesting)
-
-  # fixme, not sure this line is still needed:
-  enable_testing() # must be called from the root CMakeLists, see man page
-
-
-  if(EIGEN_LEAVE_TEST_IN_ALL_TARGET)
-    add_subdirectory(test) # can't do EXCLUDE_FROM_ALL here, breaks CTest
-  else()
-    add_subdirectory(test EXCLUDE_FROM_ALL)
-  endif()
-
   if(EIGEN_LEAVE_TEST_IN_ALL_TARGET)
     add_subdirectory(blas)
     add_subdirectory(lapack)
